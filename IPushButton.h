@@ -7,26 +7,29 @@
 class IPushButton
 {
 public:
-    using self_type = IPushButton;
-    using size_type = uint8_t;
+    using self_type     = IPushButton;
+    using size_type     = byte;
+    using time_type     = decltype(millis());
+    using cnt_type      = time_type;
 
 protected:
-    typedef struct{ enum eState : size_type { none, idle =1<<0, push =1<<1, hold =1<<2, release =1<<3, delay =1<<4 }; }PushButtonState_;
+    typedef struct { enum eState : byte { idle = 1 << 0, push = 1 << 1, hold = 1 << 2, release = 1 << 3, delay = 1 << 4, mash = 1 << 5 }; }PushButtonState_;
 
 public:
     using eState = PushButtonState_::eState;
 
 protected:
-    size_t debounce_delay;  // default: 50 ms.
-    size_t repeat_delay;
-    size_t push_timestamp;
-    size_t release_timestamp;
-    size_t cycle_count;
+    time_type debounce_delay;  // default: 50 ms.
+    time_type repeat_delay;
+    time_type push_timestamp;
+    time_type release_timestamp;
+    cnt_type cycle_count;
+    cnt_type mash_count;
+    size_type pin_id;
+    size_type pin_mode;
     bool is_enabled;
     bool is_pushed;
     bool is_inversed;
-    size_type pin_id;
-    size_type pin_mode;
     eState current_state;
 
 protected:
@@ -45,15 +48,7 @@ public:
 
     IPushButton();
 
-    IPushButton(const self_type&);
-
-    IPushButton(self_type&&);
-
     IPushButton(size_type, size_type);
-
-    self_type& operator=(const self_type&);
-
-    self_type& operator=(self_type&&);
 
 
     bool isEnabled() const;
@@ -72,17 +67,19 @@ public:
 
     void mode(size_type);
 
-    size_t debounceDelay() const;
+    time_type debounceDelay() const;
 
-    void debounceDelay(size_t);
+    void debounceDelay(time_type);
 
-    size_t repeatDelay() const;
+    time_type repeatDelay() const;
 
-    void repeatDelay(size_t);
+    void repeatDelay(time_type);
 
-    size_t pushTime() const;
+    time_type pushTime() const;
 
-    size_t releaseTime() const;
+    time_type releaseTime() const;
+
+    cnt_type mashCount() const;   // if(!((mashCount() + 1) % n)) { /* match each n-th fast click */ }; if (mashCount() & 1) { /* Each odd */ };
 
     void inverse();
 
@@ -103,7 +100,12 @@ public:
 
 constexpr IPushButton::eState operator|(IPushButton::eState lhs_, IPushButton::eState rhs_)
 {
-    return static_cast<IPushButton::eState>(static_cast<IPushButton::size_type>(lhs_) | static_cast<IPushButton::size_type>(rhs_));
+    return static_cast<IPushButton::eState>(static_cast<byte>(lhs_) | static_cast<byte>(rhs_));
+}
+
+inline IPushButton::eState operator|=(IPushButton::eState& lhs_, IPushButton::eState rhs_)
+{
+    return lhs_ = lhs_ | rhs_;
 }
 
 

@@ -2,22 +2,23 @@
 
 
 
-IPushButton::IPushButton()
-{
-    reset();
-}
-
-IPushButton::IPushButton(const self_type& other_)
-{
-    *this = other_;
-}
-
-IPushButton::IPushButton(self_type&& other_)
-{
-    *this = std::move(other_);
-}
+IPushButton::IPushButton() :
+    debounce_delay{ 50 },
+    repeat_delay{},
+    push_timestamp{},
+    release_timestamp{},
+    cycle_count{},
+    mash_count{},
+    is_enabled{},
+    is_pushed{},
+    is_inversed{},
+    pin_id{},
+    pin_mode{},
+    current_state{ eState::idle }
+{}
 
 IPushButton::IPushButton(size_type id_, size_type mode_)
+    : IPushButton()
 {
     reset();
     pin_id = id_;
@@ -25,38 +26,6 @@ IPushButton::IPushButton(size_type id_, size_type mode_)
     is_inversed = (mode_ >> 1);
     pinMode(pin_id, pin_mode);  // set pinmode
     is_enabled = true;
-}
-
-IPushButton::self_type& IPushButton::operator=(const self_type& other_)
-{
-    this->debounce_delay = other_.debounce_delay;
-    this->repeat_delay = other_.repeat_delay;
-    this->push_timestamp = other_.push_timestamp;
-    this->release_timestamp = other_.release_timestamp;
-    this->cycle_count = other_.cycle_count;
-    this->is_enabled = other_.is_enabled;
-    this->is_pushed = other_.is_pushed;
-    this->is_inversed = other_.is_inversed;
-    this->pin_id = other_.pin_id;
-    this->pin_mode = other_.pin_mode;
-    this->current_state = other_.current_state;
-    return *this;
-}
-
-IPushButton::self_type& IPushButton::operator=(self_type&& other_)
-{
-    this->debounce_delay = other_.debounce_delay;
-    this->repeat_delay = other_.repeat_delay;
-    this->push_timestamp = other_.push_timestamp;
-    this->release_timestamp = other_.release_timestamp;
-    this->cycle_count = other_.cycle_count;
-    this->is_enabled = other_.is_enabled;
-    this->is_pushed = other_.is_pushed;
-    this->is_inversed = other_.is_inversed;
-    this->pin_id = other_.pin_id;
-    this->pin_mode = other_.pin_mode;
-    this->current_state = other_.current_state;
-    return *this;
 }
 
 
@@ -70,6 +39,7 @@ void IPushButton::onDelayFn() {}
 
 void IPushButton::onIdleFn() {}
 
+
 bool IPushButton::isEnabled() const
 {
     return is_enabled;
@@ -77,7 +47,7 @@ bool IPushButton::isEnabled() const
 
 bool IPushButton::isDebounceDelay() const
 {
-    return millis() < ((push_timestamp > release_timestamp ? push_timestamp : release_timestamp) + debounce_delay);
+    return millis() < (max(push_timestamp, release_timestamp) + debounce_delay);
 }
 
 bool IPushButton::isRepeatDelay() const
@@ -98,6 +68,7 @@ IPushButton::size_type IPushButton::id() const
 void IPushButton::id(size_type id_)
 {
     pin_id = id_;
+    pinMode(pin_id, pin_mode);
 }
 
 IPushButton::size_type IPushButton::mode() const
@@ -108,36 +79,42 @@ IPushButton::size_type IPushButton::mode() const
 void IPushButton::mode(size_type mode_)
 {
     pin_mode = mode_;
+    pinMode(pin_id, pin_mode);
 }
 
-size_t IPushButton::debounceDelay() const
+IPushButton::time_type IPushButton::debounceDelay() const
 {
     return debounce_delay;
 }
 
-void IPushButton::debounceDelay(size_t delay_)
+void IPushButton::debounceDelay(time_type delay_)
 {
     debounce_delay = delay_;
 }
 
-size_t IPushButton::repeatDelay() const
+IPushButton::time_type IPushButton::repeatDelay() const
 {
     return repeat_delay;
 }
 
-size_t IPushButton::pushTime() const
+void IPushButton::repeatDelay(time_type delay_)
+{
+    repeat_delay = delay_;
+}
+
+IPushButton::time_type IPushButton::pushTime() const
 {
     return push_timestamp;
 }
 
-size_t IPushButton::releaseTime() const
+IPushButton::time_type IPushButton::releaseTime() const
 {
     return release_timestamp;
 }
 
-void IPushButton::repeatDelay(size_t delay_)
+IPushButton::cnt_type IPushButton::mashCount() const
 {
-    repeat_delay = delay_;
+    return mash_count;
 }
 
 void IPushButton::inverse()
@@ -181,11 +158,18 @@ void IPushButton::update()
     }
     // If just pushed.
     else if (!is_pushed) {
+        bool is_mash_{ release_timestamp < push_timestamp + repeat_delay };
         is_pushed = true;
         ++cycle_count;
         push_timestamp = millis();
         current_state = eState::push;
         onPushFn();
+        // Count seq fast push.
+        if (is_mash_ && (push_timestamp < release_timestamp + repeat_delay)) {
+            ++mash_count;
+            current_state |= eState::mash;
+        }
+        else { mash_count = 0; }
     }
     // If button was pushed, check it still is.
     else if (!(bool(digitalRead(pin_id)) ^ is_inversed)) {
@@ -215,6 +199,7 @@ void IPushButton::reset()
     push_timestamp = 0;
     release_timestamp = 0;
     cycle_count = 0;
+    mash_count = 0;
     is_enabled = false;
     is_pushed = false;
     is_inversed = false;
@@ -222,7 +207,6 @@ void IPushButton::reset()
     pin_mode = 0;
     current_state = eState::idle;
 }
-
 
 
 
