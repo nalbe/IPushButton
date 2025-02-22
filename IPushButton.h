@@ -79,7 +79,11 @@ public:
 
     time_type releaseTime() const;
 
-    cnt_type mashCount() const;   // if(!((mashCount() + 1) % n)) { /* match each n-th fast click */ }; if (mashCount() & 1) { /* Each odd */ };
+    cnt_type mashCount() const;
+    // mashCount() returns the number of rapid clicks (e.g., for double-click detection).
+    // Example:   
+    //    if(!((mashCount() + 1) % n)) { /* Match each n-th click. */ };
+    //    if (mashCount() & 1) { /* Match each odd click. */ };
 
     void inverse();
 
