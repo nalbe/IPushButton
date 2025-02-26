@@ -17,7 +17,7 @@ It provides a simple interface to manage button states and events with customiza
 ## Installation
 To use the `IPushButton` library in your project, follow these steps:
 1. Clone the repository: `git clone https://github.com/nalbe/IPushButton.git`
-2. Include the header file in your project: `#include "IPushButton.h"`
+2. Include the header files in your project: `#include <Arduino.h>`; `#include "IPushButton.h"`
 3. Create an instance of the `IPushButton` class: `IPushButton button(pin, mode);` (replace `pin` and `mode` with appropriate values)
 4. Call the `update()` function in your loop: `button.update();`    
 5. Handle button events by overriding virtual methods (`onPushFn`, `onHoldFn`, etc.) or using `getState()` to check the current state.
@@ -233,12 +233,24 @@ Call `useLocalTime(true)` to switch to local timestamp.
 ```
 
 
-## API Reference
-### Constructors
+## **Library Documentation**
+
+
+### **Dependencies**
+This library depends on the Arduino framework. To use this library, ensure that `Arduino.h` is included in your project before including this library's header file.
+
+#### **Notes**
+- If you are using the Arduino IDE, `Arduino.h` is automatically included for you, so you don’t need to explicitly include it in your sketch.
+- If you are using a non-Arduino environment, ensure that the Arduino framework is properly set up and `Arduino.h` is available.
+
+
+### API Reference
+
+#### Constructors
 - `IPushButton()`
 - `IPushButton(size_type pin, size_type mode)`
 
-### Methods
+#### Methods
 - `bool isEnabled() const`
 - `bool isDebounceDelay() const`
 - `bool isRepeatDelay() const`
@@ -269,8 +281,7 @@ Call `useLocalTime(true)` to switch to local timestamp.
 - `time_type accelerationThreshold() const`
 - `void accelerationThreshold(time_type)`
 
-
-### Virtual Methods
+#### Virtual Methods
 - `virtual ~IPushButton()`
 - `virtual void onPushFn()`
 - `virtual void onHoldFn()`
@@ -279,6 +290,6 @@ Call `useLocalTime(true)` to switch to local timestamp.
 - `virtual void onIdleFn()`
 
 
-## License
+### License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
