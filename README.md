@@ -113,22 +113,22 @@ void loop()
 
 ## Possible output:
 ```cpp
-`Short push:`
+# Short push:
 push
 release
-`Hold a while:`
+# Hold a while:
 push
 hold
 hold
 hold
 release
-`Double click:`
+# Double click:
 push
 release
 push
 dbl_click
 release
-`4 rapid clicks interpreted as 2 double:`
+# 4 rapid clicks interpreted as 2 double:
 push
 release
 push
