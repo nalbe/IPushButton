@@ -8,7 +8,7 @@ class IPushButton
 public:
     using self_type     = IPushButton;
     using size_type     = byte;
-	using time_type		= decltype(millis());	// Follow the Arduino convention for time type
+    using time_type     = decltype(millis()); // Follow the Arduino convention for time type
     using cnt_type      = time_type;
 
 protected:
@@ -21,7 +21,7 @@ public:
 protected:
     time_type debounce_delay;  // default: 50 ms
     time_type repeat_delay;
-	time_type local_timestamp;
+    time_type local_timestamp;
     time_type push_timestamp;
     time_type release_timestamp;
     cnt_type cycle_count;
@@ -32,15 +32,15 @@ protected:
     bool is_pushed;
     bool is_inverted;
     bool is_local;
-	bool is_accelerated;
+    bool is_accelerated;
     eState current_state;
 
-	struct {
-		cnt_type offset;
-		cnt_type threshold;
-		cnt_type value;
-		cnt_type ratio; // default: 1
-	} acceleration;
+    struct {
+        cnt_type offset;
+        cnt_type threshold;
+        cnt_type value;
+        cnt_type ratio; // default: 1
+    } acceleration;
 
 protected:
     // Function to handle push event
@@ -55,11 +55,11 @@ protected:
     virtual void onIdleFn();
 
 private:
-	// Acceleration offset calculation
-	void accelerationOffset();
+    // Acceleration offset calculation
+    void accelerationOffset();
 
 public:
-	// Default destructor
+    // Default destructor
     virtual ~IPushButton() = default;
 
     // Default constructor
@@ -80,10 +80,10 @@ public:
     // Check if the button is inversed
     bool isInverted() const;
     
-	// Check if the button is used global or local time anchor
+    // Check if the button is used global or local time anchor
     bool isLocalTime() const;
     
-	// Check if the button is accelerated
+    // Check if the button is accelerated
     bool isAccelerated() const;
 
     // Get the ID of the button
@@ -116,17 +116,17 @@ public:
     // Get the release timestamp
     time_type releaseTime() const;
 
-	// Returns the count of rapid clicks
-	// `1` for a double-click, `2` for a triple-click, and so on
-	// Example usage:
-	//    if (!((rapidCount() + 1) % n)) { /* match every n-th click */ }
-	//    if (rapidCount() & 1) { /* match every odd click */ }
-	cnt_type rapidCount() const;
+    // Returns the count of rapid clicks
+    // `1` for a double-click, `2` for a triple-click, and so on
+    // Example usage:
+    //    if (!((rapidCount() + 1) % n)) { /* match every n-th click */ }
+    //    if (rapidCount() & 1) { /* match every odd click */ }
+    cnt_type rapidCount() const;
 
-	// Set the button to use local time anchor
-	void useLocalTime(bool);
+    // Set the button to use local time anchor
+    void useLocalTime(bool);
 
-	// Inverte logic by default if pinMode is INPUT_PULLUP
+    // Inverte logic by default if pinMode is INPUT_PULLUP
     void inverte();
 
     // Enable the button
@@ -148,23 +148,23 @@ public:
     // Toggle acceleration
     void useAcceleration(bool);
 
-	// Get the acceleration value
-	time_type accelerationValue() const;
+    // Get the acceleration value
+    time_type accelerationValue() const;
 
-	// Set the acceleration value
-	void accelerationValue(time_type);
+    // Set the acceleration value
+    void accelerationValue(time_type);
 
-	// Get the acceleration threshold
-	time_type accelerationThreshold() const;
+    // Get the acceleration threshold
+    time_type accelerationThreshold() const;
 
-	// Set the acceleration threshold
-	void accelerationThreshold(time_type);
+    // Set the acceleration threshold
+    void accelerationThreshold(time_type);
 
-	// Get the acceleration threshold
-	cnt_type accelerationRatio() const;
+    // Get the acceleration threshold
+    cnt_type accelerationRatio() const;
 
-	// Set the acceleration threshold
-	void accelerationRatio(cnt_type);
+    // Set the acceleration threshold
+    void accelerationRatio(cnt_type);
 
 };
 
@@ -175,11 +175,14 @@ public:
 // Overload the bitwise OR operator for eState
 constexpr IPushButton::eState operator|(IPushButton::eState lhs_, IPushButton::eState rhs_)
 {
-	return static_cast<IPushButton::eState>(static_cast<byte>(lhs_) | static_cast<byte>(rhs_));
+    return static_cast<IPushButton::eState>(static_cast<byte>(lhs_) | static_cast<byte>(rhs_));
 }
 
 // Overload the bitwise OR assignment operator for eState
 inline IPushButton::eState operator|=(IPushButton::eState& lhs_, IPushButton::eState rhs_)
 {
-	return lhs_ = lhs_ | rhs_;
+    return lhs_ = lhs_ | rhs_;
 }
+
+
+
