@@ -178,7 +178,7 @@ void IPushButton::update()
         // Rapid push handling.
         if (is_mash_ && (push_timestamp < release_timestamp + repeat_delay)) {
             ++rapid_count;
-			current_state |= eState::RAPID; // hold the both `PUSH` and `RAPID` states
+            current_state |= eState::RAPID; // hold the both `PUSH` and `RAPID` states
         }
         else { rapid_count = 0; }
     }
@@ -189,7 +189,7 @@ void IPushButton::update()
         release_timestamp = millis(); // debounce on release also
         current_state = eState::RELEASE;
         onReleaseFn();
-		acceleration.offset = 0;
+        acceleration.offset = 0;
     }
     // If holded.
     else if (!isRepeatDelay()) {
