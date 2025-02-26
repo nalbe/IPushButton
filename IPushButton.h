@@ -119,8 +119,8 @@ public:
     // Returns the count of rapid clicks
     // `1` for a double-click, `2` for a triple-click, and so on
     // Example usage:
-    //    if (!((rapidCount() + 1) % n)) { /* match every n-th click */ }
-    //    if (rapidCount() & 1) { /* match every odd click */ }
+    //    if (!((rapidCount() + 1) % n)) { /* match every n-th click, n >= 2 */ }
+    //    if (rapidCount() & 1) { /* match every even click */ }
     cnt_type rapidCount() const;
 
     // Set the button to use local time anchor
