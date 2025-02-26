@@ -142,12 +142,23 @@ release
 ```
 
 
-## Time anchor
+## **Library Documentation**
+
+
+### **Dependencies**
+This library depends on the Arduino framework. To use this library, ensure that `Arduino.h` is included in your project before including this library's header file.
+
+#### **Notes**
+- If you are using the Arduino IDE, `Arduino.h` is automatically included for you, so you don’t need to explicitly include it in your sketch.
+- If you are using a non-Arduino environment, ensure that the Arduino framework is properly set up and `Arduino.h` is available.
+
+
+### Time anchor
 By default, time intervals between events calculated using global timestamp.
 Call `useLocalTime(true)` to switch to local timestamp.
 
 
-## `update()` function pseudocode:
+### `update()` function pseudocode:
 ```cpp
 +-----------------------------------+
 | Start update()                    |
@@ -231,17 +242,6 @@ Call `useLocalTime(true)` to switch to local timestamp.
 | End update()                      |
 +-----------------------------------+
 ```
-
-
-## **Library Documentation**
-
-
-### **Dependencies**
-This library depends on the Arduino framework. To use this library, ensure that `Arduino.h` is included in your project before including this library's header file.
-
-#### **Notes**
-- If you are using the Arduino IDE, `Arduino.h` is automatically included for you, so you don’t need to explicitly include it in your sketch.
-- If you are using a non-Arduino environment, ensure that the Arduino framework is properly set up and `Arduino.h` is available.
 
 
 ### API Reference
