@@ -1,7 +1,6 @@
 #include "IPushButton.h"
 
 
-
 IPushButton::IPushButton()
 {
     reset();
