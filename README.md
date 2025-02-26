@@ -35,11 +35,11 @@ Here is an example of how to use the `IPushButton` class:
 class MyPushButton : public IPushButton
 {
 protected:
-	void onPushFn() override	{ /* Handle push event */ }
-	void onHoldFn() override	{ /* Handle hold event */ }
-	void onReleaseFn() override	{ /* Handle release event */ }
-	void onDelayFn() override	{ /* Handle delay event */ }
-	void onIdleFn() override	{ /* Handle idle event */ }
+    void onPushFn() override    { /* Handle push event */ }
+    void onHoldFn() override    { /* Handle hold event */ }
+    void onReleaseFn() override { /* Handle release event */ }
+    void onDelayFn() override   { /* Handle delay event */ }
+    void onIdleFn() override    { /* Handle idle event */ }
 };
 
 // Create an instance with pin XX and mode YY.
@@ -48,19 +48,19 @@ MyPushButton button(D9, INPUT_PULLUP);
 // Setup function
 void setup()
 {
-	// Set debounce delay to 60 ms (default is 50 ms)
-	button.debounceDelay(60);
-	// Set repeat delay to 250 ms (default is 0 ms)
-	button.repeatDelay(250);
+    // Set debounce delay to 60 ms (default is 50 ms)
+    button.debounceDelay(60);
+    // Set repeat delay to 250 ms (default is 0 ms)
+    button.repeatDelay(250);
 }
 
 // Update the button state in the loop.
 void loop()
 {
-	// Update the button state
-	button.update();
+    // Update the button state
+    button.update();
 
-	// your code here
+    // your code here
 }
 ```
 
@@ -72,63 +72,63 @@ IPushButton button(D9, INPUT_PULLUP);
 
 void setup()
 {
-	Serial.begin(115200);
-	button.debounceDelay(60);
-	button.repeatDelay(250);
+    Serial.begin(115200);
+    button.debounceDelay(60);
+    button.repeatDelay(250);
 }
 
 void loop()
 {
-	button.update();
+    button.update();
 
-	// Handle button events
+    // Handle button events
     if (button.state() & IPushButton::eState::PUSH) {
-		// Handle push event
-		Serial.println("push");
+        // Handle push event
+        Serial.println("push");
     }
-	else if (button.state() & IPushButton::eState::HOLD) {
-		// Handle hold event
-		Serial.println("hold");
+    else if (button.state() & IPushButton::eState::HOLD) {
+        // Handle hold event
+        Serial.println("hold");
     }
-	else if (button.state() & IPushButton::eState::RELEASE) {
-		// Handle release event
-		Serial.println("release");
+    else if (button.state() & IPushButton::eState::RELEASE) {
+        // Handle release event
+        Serial.println("release");
     }
-	else if (button.state() & IPushButton::eState::DELAY) {
-		// Handle delay event
-		//Serial.println("..");
+    else if (button.state() & IPushButton::eState::DELAY) {
+        // Handle delay event
+        //Serial.println("..");
     }
-	else if (button.state() & IPushButton::eState::IDLE) {
-		// Handle idle event
-		//Serial.println(".");
+    else if (button.state() & IPushButton::eState::IDLE) {
+        // Handle idle event
+        //Serial.println(".");
     }
     if ((button.state() & IPushButton::eState::RAPID) and (button.rapidCount() & 1)) {
-		// Handle rapid event
-		Serial.println("dbl_click");
-	}
+        // Handle rapid event
+        Serial.println("dbl_click");
+    }
 
-	// your code here
+    // your code here
 }
 ```
 
 ## Possible output:
 ```cpp
-// Short push:
+`Short push:`
 push
 release
-// Hold a while:
+`Hold a while:`
 push
 hold
 hold
 hold
 release
-// Double click:
+`Double click:`
 push
 release
 push
 dbl_click
 release
-// 4 rapid clicks interpreted as 2 double:
+`4 rapid clicks interpreted as 2 double:`
 push
 release
 push
