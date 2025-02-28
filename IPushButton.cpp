@@ -145,33 +145,33 @@ IPushButton::eState IPushButton::state() const
 
 void IPushButton::update()
 {
-	// If disabled.
+    // If disabled.
     if (!is_enabled) {
-		return;
-	}
+        return;
+    }
 
     // Within the debounce delay.
     if (isDebounceDelay()) {
-		// Still pushed.
+        // Still pushed.
         if (is_pushed) {
             current_state = eState::DELAY;
             onDelayFn();
         }
-		// Released.
+        // Released.
         else {
             current_state = eState::IDLE;
             onIdleFn();
-		}
-		return;
+        }
+        return;
     }
 
-	bool isActiveNow = bool(digitalRead(pin_id)) ^ is_inverted;
+    bool isActiveNow = bool(digitalRead(pin_id)) ^ is_inverted;
 
     // Was not pushed.
     if (!is_pushed and !isActiveNow) {
         current_state = eState::IDLE;
         onIdleFn();
-		return;
+        return;
     }
 
     // Is just pushed.
@@ -188,7 +188,7 @@ void IPushButton::update()
         }
         else { rapid_count = 0; }
         onPushFn();
-		return;
+        return;
     }
 
     // Was released.
@@ -199,7 +199,7 @@ void IPushButton::update()
         current_state = eState::RELEASE;
         acceleration.offset = 0;
         onReleaseFn();
-		return;
+        return;
     }
 
     // Is holded.
@@ -210,14 +210,14 @@ void IPushButton::update()
         // Acceleration handling.
         if (is_accelerated) { AccOffsetCalc__(); }
         onHoldFn();
-		return;
+        return;
     }
 
     // Within the repeat delay.
     {
         current_state = eState::DELAY;
         onDelayFn();
-		return;
+        return;
     }
 }
 
@@ -244,12 +244,12 @@ void IPushButton::reset()
 
 void IPushButton::AccOffsetCalc__()
 {
-	if (repeat_delay >= acceleration.threshold + acceleration.value * (cycle_count - 1)) {
-		acceleration.offset += acceleration.value * (is_local ? 1 : cycle_count - 1);
-	}
-	else {
-		acceleration.offset += repeat_delay - acceleration.threshold - (is_local ? acceleration.offset : 0);
-	}
+    if (repeat_delay >= acceleration.threshold + acceleration.value * (cycle_count - 1)) {
+        acceleration.offset += acceleration.value * (is_local ? 1 : cycle_count - 1);
+    }
+    else {
+        acceleration.offset += repeat_delay - acceleration.threshold - (is_local ? acceleration.offset : 0);
+    }
 }
 
 IPushButton::time_type IPushButton::accelerationValue() const
