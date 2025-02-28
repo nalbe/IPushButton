@@ -3,15 +3,18 @@
 
 
 ## Overview
-`IPushButton` is a C++ library designed to handle push button events such as push, hold, release, delay, and rapid clicks.
-It provides a simple interface to manage button states and events with customizable debounce and repeat delays.
+`IPushButton` is a C++ library designed to handle push button events such as push, hold, release etc.
+It provides a simple interface to manage button states and events with different customization.
 
 
-## Features
-- Handle different button states: idle, push, hold, release, delay, and mash.
-- Customizable debounce and repeat delays.
-- Support for inversed button states.
-- Easy integration with existing projects.
+## Features  
+- Handles different button states: idle, push, hold, release, delay, and rapid.  
+- Customizable debounce and repeat delays using the `debounceDelay()` and `repeatDelay()` methods.  
+- Detects rapid clicks (double, triple, etc.).  
+- Acceleration feature to increase the button repeat rate (e.g., fast scrolling).  
+- Supports inverted button states.  
+- Allows switching between different time measurement methods.  
+- Easily integrates with existing projects.  
 
 
 ## Installation
@@ -20,10 +23,7 @@ To use the `IPushButton` library in your project, follow these steps:
 2. Include the header files in your project: `#include <Arduino.h>`; `#include "IPushButton.h"`
 3. Create an instance of the `IPushButton` class: `IPushButton button(pin, mode);` (replace `pin` and `mode` with appropriate values)
 4. Call the `update()` function in your loop: `button.update();`    
-5. Handle button events by overriding virtual methods (`onPushFn`, `onHoldFn`, etc.) or using `getState()` to check the current state.
-6. Customize debounce and repeat delays using `debounceDelay()` and `repeatDelay()` methods.
-7. Detect rapid clicks via `rapidcount()` and state checks.
-8. Use acceleration feature to increase the repeat rate of the button.
+5. Handle button events by overriding virtual methods (`onPushFn`, `onHoldFn`, etc.) or using `getState()` to check the current state
 
 
 ## Usage
@@ -153,95 +153,17 @@ This library depends on the Arduino framework. To use this library, ensure that 
 - If you are using a non-Arduino environment, ensure that the Arduino framework is properly set up and `Arduino.h` is available.
 
 
-### Time anchor
-By default, time intervals between events calculated using global timestamp.
-Call `useLocalTime(true)` to switch to local timestamp.
+### Time Measurement Method Switching
 
+This feature allows users to choose how timestamps are updated when interacting with a button. There are two modes:
 
-### `update()` function pseudocode:
-```cpp
-+-----------------------------------+
-| Start update()                    |
-+-----------------------------------+
-            |
-            v
-+-----------------------------------+
-| Is the button enabled?            |
-| - No: Exit function               |
-| - Yes: Continue                   |
-+-----------------------------------+
-            |
-            v
-+-----------------------------------+
-| Is within debounce delay period?  |
-| - Yes:                            |
-|   • If pushed: Set state = DELAY, |
-|     call onDelayFn()              |
-|   • Else: Set state = IDLE,       |
-|     call onIdleFn()               |
-| - No: Continue                    |
-+-----------------------------------+
-            |
-            v
-+-----------------------------------+
-| Is the button not pushed?         |
-| - Yes: Set state = IDLE,          |
-|   call onIdleFn()                 |
-| - No: Continue                    |
-+-----------------------------------+
-            |
-            v
-+-----------------------------------+
-| Is the button just pushed?        |
-| - Yes:                            |
-|   • Detect rapid (quick) push:    |
-|     - Increment rapidCount        |
-|     - Set state = PUSH_WITH_MASH  |
-|   • Else: Reset rapidCount        |
-|   • Set isPushed = true           |
-|   • Increment cycleCount          |
-|   • Update pushTimestamp          |
-|   • Set state = PUSH              |
-|   • Call onPushFn()               |
-| - No: Continue                    |
-+-----------------------------------+
-            |
-            v
-+-----------------------------------+
-| Was the button pushed and         |
-| released?                         |
-| - Yes:                            |
-|   • Set isPushed = false          |
-|   • Reset cycleCount              |
-|   • Update releaseTimestamp       |
-|   • Set state = RELEASE           |
-|   • Call onReleaseFn()            |
-| - No: Continue                    |
-+-----------------------------------+
-            |
-            v
-+-----------------------------------+
-| Is the button held past repeat    |
-| delay?                            |
-| - Yes:                            |
-|   • Increment cycleCount          |
-|   • Set state = HOLD              |
-|   • Call onHoldFn()               |
-| - No: Continue                    |
-+-----------------------------------+
-            |
-            v
-+-----------------------------------+
-| Default:                          |
-| • Set state = DELAY               |
-| • Call onDelayFn()                |
-+-----------------------------------+
-            |
-            v
-+-----------------------------------+
-| End update()                      |
-+-----------------------------------+
-```
+- **Global Timestamp:** The timestamp updates only when the button is pressed.
+  The actual time between events may be shorter than the repeat delay, depending on the overall loop delay.
+
+- **Local Timestamp:** The timestamp updates continuously on every cycle while the button is pressed.
+  The actual time between events may be longer than the repeat delay, depending on the overall loop delay.
+
+By switching between these methods, user can balance performance and accuracy based on their needs.
 
 
 ### API Reference
@@ -268,13 +190,12 @@ Call `useLocalTime(true)` to switch to local timestamp.
 - `time_type releaseTime() const`
 - `cnt_type rapidCount() const`
 - `void useLocalTime(bool)`
-- `void inverse()`
-- `void enable()`
-- `void disable()`
+- `void inverse(bool)`
+- `void enable(bool)`
 - `eState state() const`
 - `void update()`
 - `void reset()`
-- `void useAcceleration(bool)`
+- `void accelerate(bool)`
 - `bool isAccelerated() const`
 - `time_type accelerationValue() const`
 - `void accelerationValue(time_type)`

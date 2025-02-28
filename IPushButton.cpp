@@ -7,12 +7,12 @@ IPushButton::IPushButton()
     reset();
 }
 
-IPushButton::IPushButton(size_type id_, size_type mode_)
+IPushButton::IPushButton(size_type pinID_, size_type pinMODE_)
     : IPushButton()
 {
-    pin_id = id_;
-    pin_mode = mode_;
-    is_inverted = (mode_ >> 1);
+    pin_id = pinID_;
+    pin_mode = pinMODE_;
+    is_inverted = (pinMODE_ >> 1);
     pinMode(pin_id, pin_mode); // set pinmode
     is_enabled = true;
 }
@@ -42,7 +42,7 @@ bool IPushButton::isDebounceDelay() const
 bool IPushButton::isRepeatDelay() const
 {
     return millis() + acceleration.offset < (is_local ? 
-        local_timestamp + repeat_delay : 
+        hold_timestamp + repeat_delay : 
         push_timestamp + (repeat_delay * cycle_count));
 }
 
@@ -66,9 +66,9 @@ IPushButton::size_type IPushButton::id() const
     return pin_id;
 }
 
-void IPushButton::id(size_type id_)
+void IPushButton::id(size_type value_)
 {
-    pin_id = id_;
+    pin_id = value_;
     pinMode(pin_id, pin_mode);
 }
 
@@ -77,9 +77,9 @@ IPushButton::size_type IPushButton::mode() const
     return pin_mode;
 }
 
-void IPushButton::mode(size_type mode_)
+void IPushButton::mode(size_type value_)
 {
-    pin_mode = mode_;
+    pin_mode = value_;
     pinMode(pin_id, pin_mode);
 }
 
@@ -88,9 +88,9 @@ IPushButton::time_type IPushButton::debounceDelay() const
     return debounce_delay;
 }
 
-void IPushButton::debounceDelay(time_type delay_)
+void IPushButton::debounceDelay(time_type value_)
 {
-    debounce_delay = delay_;
+    debounce_delay = value_;
 }
 
 IPushButton::time_type IPushButton::repeatDelay() const
@@ -98,9 +98,9 @@ IPushButton::time_type IPushButton::repeatDelay() const
     return repeat_delay;
 }
 
-void IPushButton::repeatDelay(time_type delay_)
+void IPushButton::repeatDelay(time_type value_)
 {
-    repeat_delay = delay_;
+    repeat_delay = value_;
 }
 
 IPushButton::time_type IPushButton::pushTime() const
@@ -118,29 +118,24 @@ IPushButton::cnt_type IPushButton::rapidCount() const
     return rapid_count;
 }
 
-void IPushButton::inverte()
+void IPushButton::invert(bool value_)
 {
-    is_inverted = !is_inverted;
+    is_inverted = value_;
 }
 
-void IPushButton::useLocalTime(bool b_)
+void IPushButton::useLocalTime(bool value_)
 {
-    is_local = b_;
+    is_local = value_;
 }
 
-void IPushButton::useAcceleration(bool b_)
+void IPushButton::accelerate(bool value_)
 {
-    is_accelerated = b_;
+    is_accelerated = value_;
 }
 
-void IPushButton::enable()
+void IPushButton::enable(bool value_)
 {
-    is_enabled = true;
-}
-
-void IPushButton::disable()
-{
-    is_enabled = false;
+    is_enabled = value_;
 }
 
 IPushButton::eState IPushButton::state() const
@@ -150,61 +145,79 @@ IPushButton::eState IPushButton::state() const
 
 void IPushButton::update()
 {
-    if (!is_enabled) { return; }
+	// If disabled.
+    if (!is_enabled) {
+		return;
+	}
 
-    // If within the debounce delay, check if the button is still pushed.
+    // Within the debounce delay.
     if (isDebounceDelay()) {
+		// Still pushed.
         if (is_pushed) {
             current_state = eState::DELAY;
             onDelayFn();
         }
+		// Released.
         else {
             current_state = eState::IDLE;
             onIdleFn();
-        }
+		}
+		return;
     }
-    // If button wasn't pushed, check it is.
-    else if (!(is_pushed || bool(digitalRead(pin_id)) ^ is_inverted)) {
+
+	bool isActiveNow = bool(digitalRead(pin_id)) ^ is_inverted;
+
+    // Was not pushed.
+    if (!is_pushed and !isActiveNow) {
         current_state = eState::IDLE;
         onIdleFn();
+		return;
     }
-    // If just pushed.
-    else if (!is_pushed) {
+
+    // Is just pushed.
+    if (!is_pushed) {
         bool is_mash_{ release_timestamp < push_timestamp + repeat_delay };
         is_pushed = true;
         ++cycle_count;
         push_timestamp = millis();
         current_state = eState::PUSH;
-        onPushFn();
         // Rapid push handling.
         if (is_mash_ && (push_timestamp < release_timestamp + repeat_delay)) {
             ++rapid_count;
             current_state |= eState::RAPID; // hold the both `PUSH` and `RAPID` states
         }
         else { rapid_count = 0; }
+        onPushFn();
+		return;
     }
-    // If button was pushed, check it still is.
-    else if (!(bool(digitalRead(pin_id)) ^ is_inverted)) {
+
+    // Was released.
+    if (!isActiveNow) {
         is_pushed = false;
         cycle_count = 0;
         release_timestamp = millis(); // debounce on release also
         current_state = eState::RELEASE;
-        onReleaseFn();
         acceleration.offset = 0;
+        onReleaseFn();
+		return;
     }
-    // If holded.
-    else if (!isRepeatDelay()) {
-        local_timestamp = millis();
+
+    // Is holded.
+    if (!isRepeatDelay()) {
+        hold_timestamp = millis();
         ++cycle_count;
         current_state = eState::HOLD;
-        onHoldFn();
         // Acceleration handling.
-        if (is_accelerated) { accelerationOffset(); }
+        if (is_accelerated) { AccOffsetCalc__(); }
+        onHoldFn();
+		return;
     }
-    // Set state to delay.
-    else {
+
+    // Within the repeat delay.
+    {
         current_state = eState::DELAY;
         onDelayFn();
+		return;
     }
 }
 
@@ -212,7 +225,7 @@ void IPushButton::reset()
 {
     debounce_delay = 50;
     repeat_delay = 0;
-    local_timestamp = 0;
+    hold_timestamp = 0;
     push_timestamp = 0;
     release_timestamp = 0;
     cycle_count = 0;
@@ -225,24 +238,18 @@ void IPushButton::reset()
     pin_id = 0;
     pin_mode = 0;
     current_state = eState::IDLE;
-    acceleration = { 0, 0, 0, 1 };
+    acceleration = { 0, 0, 0 };
 }
 
 
-void IPushButton::accelerationOffset()
+void IPushButton::AccOffsetCalc__()
 {
-    if (is_local) {
-        if (repeat_delay >= acceleration.threshold + acceleration.value * acceleration.ratio * (cycle_count - 1)) {
-            acceleration.offset = acceleration.value * acceleration.ratio * (cycle_count - 1);
-        }
-        else { acceleration.offset = repeat_delay - acceleration.threshold; }
-    }
-    else {
-        if (repeat_delay >= acceleration.threshold + acceleration.value * acceleration.ratio * (cycle_count - 1)) {
-            acceleration.offset = (cycle_count * acceleration.value * acceleration.ratio * (cycle_count - 1)) >> 1;
-        }
-        else { acceleration.offset += repeat_delay - acceleration.threshold; }
-    }
+	if (repeat_delay >= acceleration.threshold + acceleration.value * (cycle_count - 1)) {
+		acceleration.offset += acceleration.value * (is_local ? 1 : cycle_count - 1);
+	}
+	else {
+		acceleration.offset += repeat_delay - acceleration.threshold - (is_local ? acceleration.offset : 0);
+	}
 }
 
 IPushButton::time_type IPushButton::accelerationValue() const
@@ -265,14 +272,6 @@ void IPushButton::accelerationThreshold(time_type value_)
     acceleration.threshold = value_;
 }
 
-IPushButton::cnt_type IPushButton::accelerationRatio() const
-{
-    return acceleration.ratio;
-}
 
-void IPushButton::accelerationRatio(cnt_type value_)
-{
-    acceleration.ratio = value_;
-}
 
 
