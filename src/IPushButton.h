@@ -6,21 +6,21 @@ class IPushButton
 {
 public:
 	using self_type  = IPushButton;
-	using pin_t      = byte;
+	using pin_t      = uint8_t;
 	using millis_t   = decltype(millis()); // follow the Arduino convention for time type
 	using size_type  = millis_t;
 
 
 protected:
 	// Enum to represent the state of the push button
-	typedef struct { enum eState : byte {
-		NONE,
-		IDLE     = 1 << 0,
-		PUSH     = 1 << 1,
-		HOLD     = 1 << 2,
-		RELEASE  = 1 << 3,
-		DELAY    = 1 << 4,
-		RAPID    = 1 << 5
+	typedef struct { enum eState : uint8_t {
+		none,
+		idle     = 1 << 0,
+		push     = 1 << 1,
+		hold     = 1 << 2,
+		release  = 1 << 3,
+		delay    = 1 << 4,
+		rapid    = 1 << 5
 	}; } PushButtonState_;
 
 
@@ -192,13 +192,13 @@ public:
 	}
 
 	// Get the acceleration value
-	millis_t accelerationValue() const
+	size_type accelerationValue() const
 	{
 		return acceleration.value;
 	}
 
 	// Get the acceleration threshold
-	millis_t accelerationThreshold() const
+	size_type accelerationThreshold() const
 	{
 		return acceleration.threshold;
 	}
@@ -237,18 +237,18 @@ public:
 	}
 
 	// Set the acceleration value
-	void accelerationValue(millis_t value_)
+	void accelerationValue(size_type value_)
 	{
 		acceleration.value = value_;
 	}
 
 	// Set the acceleration threshold
-	void accelerationThreshold(millis_t value_)
+	void accelerationThreshold(size_type value_)
 	{
 		acceleration.threshold = value_;
 	}
 
-	// Invert logic. Used by default if pinMode is set to INPUT_PULLUP
+	// Invert logic (used by default if pinMode is set to INPUT_PULLUP)
 	void invert(bool value_)
 	{
 		is_inverted = value_;
@@ -265,8 +265,8 @@ public:
 	{
 		is_enabled = value_;
 		current_state = value_
-			? eState::IDLE
-			: eState::NONE;
+			? eState::idle
+			: eState::none;
 	}
 
 	// Disable the button
@@ -285,12 +285,12 @@ public:
 		if (isDebounceDelay()) {
 			// Still pushed
 			if (is_pushed) {
-				current_state = eState::DELAY;
+				current_state = eState::delay;
 				onDelayFn();
 			}
 			// Released
 			else {
-				current_state = eState::IDLE;
+				current_state = eState::idle;
 				onIdleFn();
 			}
 			return;
@@ -300,7 +300,7 @@ public:
 
 		// Was not pushed.
 		if (!is_pushed and !isActiveNow) {
-			current_state = eState::IDLE;
+			current_state = eState::idle;
 			onIdleFn();
 			return;
 		}
@@ -311,11 +311,11 @@ public:
 			is_pushed = true;
 			++cycle_count;
 			push_timestamp = millis();
-			current_state = eState::PUSH;
+			current_state = eState::push;
 			// Rapid push handling.
 			if (is_mash_ && (push_timestamp < release_timestamp + repeat_delay)) {
 				++rapid_count;
-				current_state = static_cast<eState>(current_state | eState::RAPID); // hold the both `PUSH` and `RAPID` states
+				current_state = static_cast<eState>(current_state | eState::rapid); // hold the both `PUSH` and `RAPID` states
 			}
 			else { rapid_count = 0; }
 			onPushFn();
@@ -327,7 +327,7 @@ public:
 			is_pushed = false;
 			cycle_count = 0;
 			release_timestamp = millis(); // debounce on release also
-			current_state = eState::RELEASE;
+			current_state = eState::release;
 			acceleration.offset = 0;
 			onReleaseFn();
 			return;
@@ -337,7 +337,7 @@ public:
 		if (!isRepeatDelay()) {
 			hold_timestamp = millis();
 			++cycle_count;
-			current_state = eState::HOLD;
+			current_state = eState::hold;
 			// Acceleration handling.
 			if (is_accelerated) { AccOffsetCalc__(); }
 			onHoldFn();
@@ -346,7 +346,7 @@ public:
 
 		// Within the repeat delay.
 		{
-			current_state = eState::DELAY;
+			current_state = eState::delay;
 			onDelayFn();
 			return;
 		}
@@ -381,7 +381,7 @@ public:
 constexpr IPushButton::eState operator|(const IPushButton::eState& lhs_, const IPushButton::eState& rhs_)
 {
 	return static_cast<IPushButton::eState>(
-		static_cast<byte>(lhs_) | static_cast<byte>(rhs_)
+		static_cast<uint8_t>(lhs_) | static_cast<uint8_t>(rhs_)
 		);
 }
 // Bitwise OR assignment operator
@@ -393,7 +393,7 @@ inline IPushButton::eState& operator|=(IPushButton::eState& lhs_, const IPushBut
 constexpr IPushButton::eState operator&(const IPushButton::eState& lhs_, const IPushButton::eState& rhs_)
 {
 	return static_cast<IPushButton::eState>(
-		static_cast<byte>(lhs_) & static_cast<byte>(rhs_)
+		static_cast<uint8_t>(lhs_) & static_cast<uint8_t>(rhs_)
 		);
 }
 // Bitwise AND assignment operator
