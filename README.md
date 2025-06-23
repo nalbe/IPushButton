@@ -170,7 +170,7 @@ By switching between these methods, user can balance performance and accuracy ba
 
 #### Constructors
 - `IPushButton()`
-- `IPushButton(size_type pin, size_type mode)`
+- `IPushButton(pin_t pin, pin_t mode)`
 
 #### Methods
 - `bool isEnabled() const`
@@ -178,17 +178,17 @@ By switching between these methods, user can balance performance and accuracy ba
 - `bool isRepeatDelay() const`
 - `bool isInverted() const`
 - `bool isLocalTime() const`
-- `size_type id() const`
-- `void id(size_type)`
-- `size_type mode() const`
-- `void mode(size_type)`
-- `time_type debounceDelay() const`
-- `void debounceDelay(time_type)`
-- `time_type repeatDelay() const`
-- `void repeatDelay(time_type)`
-- `time_type pushTime() const`
-- `time_type releaseTime() const`
-- `cnt_type rapidCount() const`
+- `pin_t id() const`
+- `void id(pin_t)`
+- `pin_t mode() const`
+- `void mode(pin_t)`
+- `millis_t debounceDelay() const`
+- `void debounceDelay(millis_t)`
+- `millis_t repeatDelay() const`
+- `void repeatDelay(millis_t)`
+- `millis_t pushTime() const`
+- `millis_t releaseTime() const`
+- `size_type rapidCount() const`
 - `void useLocalTime(bool)`
 - `void inverse(bool)`
 - `void enable(bool)`
@@ -197,10 +197,10 @@ By switching between these methods, user can balance performance and accuracy ba
 - `void reset()`
 - `void accelerate(bool)`
 - `bool isAccelerated() const`
-- `time_type accelerationValue() const`
-- `void accelerationValue(time_type)`
-- `time_type accelerationThreshold() const`
-- `void accelerationThreshold(time_type)`
+- `size_type accelerationValue() const`
+- `void accelerationValue(size_type)`
+- `size_type accelerationThreshold() const`
+- `void accelerationThreshold(size_type)`
 
 #### Virtual Methods
 - `virtual ~IPushButton()`
