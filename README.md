@@ -178,29 +178,30 @@ By switching between these methods, user can balance performance and accuracy ba
 - `bool isRepeatDelay() const`
 - `bool isInverted() const`
 - `bool isLocalTime() const`
+- `bool isAccelerated() const`
+- `eState state() const`
 - `pin_t id() const`
-- `void id(pin_t)`
 - `pin_t mode() const`
-- `void mode(pin_t)`
 - `millis_t debounceDelay() const`
-- `void debounceDelay(millis_t)`
 - `millis_t repeatDelay() const`
-- `void repeatDelay(millis_t)`
 - `millis_t pushTime() const`
 - `millis_t releaseTime() const`
 - `size_type rapidCount() const`
+- `size_type accelerationValue() const`
+- `size_type accelerationThreshold() const`
+- `void id(pin_t)`
+- `void mode(pin_t)`
+- `void debounceDelay(millis_t)`
+- `void repeatDelay(millis_t)`
 - `void useLocalTime(bool)`
-- `void inverse(bool)`
+- `void accelerationValue(size_type)`
+- `void accelerationThreshold(size_type)`
+- `void invert(bool)`
+- `void accelerate(bool)`
 - `void enable(bool)`
-- `eState state() const`
+- `void disable()`
 - `void update()`
 - `void reset()`
-- `void accelerate(bool)`
-- `bool isAccelerated() const`
-- `size_type accelerationValue() const`
-- `void accelerationValue(size_type)`
-- `size_type accelerationThreshold() const`
-- `void accelerationThreshold(size_type)`
 
 #### Virtual Methods
 - `virtual ~IPushButton()`
